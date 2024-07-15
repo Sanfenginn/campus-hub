@@ -9,6 +9,7 @@ import { LocalStrategy } from './local.strategy';
 import { AuthResolver } from './auth.resolver';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { LocalAuthGuard } from './local-auth.guard';
+import { PasswordService } from '../modules/admin/user/password.hash';
 
 @Global()
 @Module({
@@ -26,6 +27,7 @@ import { LocalAuthGuard } from './local-auth.guard';
     }),
   ],
   providers: [
+    PasswordService,
     AuthService,
     JwtStrategy,
     LocalStrategy,

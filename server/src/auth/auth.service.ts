@@ -2,19 +2,24 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/modules/admin/user/user.service';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { PasswordService } from '../modules/admin/user/password.hash';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly passwordService: PasswordService,
   ) {}
 
   //验证用户
   async validateUser(account: string, pass: string): Promise<any> {
     const user = await this.userService.findOneByAccount(account);
-    console.log('user in service: ', user);
-    if (user && user.password === pass) {
+    const isMatch = await this.passwordService.comparePassword(
+      pass,
+      user.password,
+    );
+    if (user && isMatch) {
       const { password, ...result } = user;
       return result;
     }

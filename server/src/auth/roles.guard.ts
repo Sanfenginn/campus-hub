@@ -22,14 +22,14 @@ export class RolesGuard implements CanActivate {
     }
     //	•	如果没有为该处理程序定义角色元数据，则默认允许访问。
 
-    console.log('requiredRoles in roles guards: ', requiredRoles);
+    // console.log('requiredRoles in roles guards: ', requiredRoles);
 
     const ctx = GqlExecutionContext.create(context);
     const user = ctx.getContext().req.user;
 
     //获取当前 HTTP 请求对象。
 
-    console.log('user in roles guards: ', user);
+    // console.log('user in roles guards: ', user);
 
     if (!user) {
       console.log('User not found in request.');

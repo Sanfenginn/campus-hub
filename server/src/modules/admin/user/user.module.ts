@@ -6,6 +6,9 @@ import { UserSchema } from './schemas/user.schema';
 import { StudentSchema } from './schemas/student.schema';
 import { TeacherSchema } from './schemas/teacher.schema';
 import { AdminSchema } from './schemas/admin.schema';
+import { PasswordService } from './password.hash';
+import { CourseSchema } from '../course/schemas/course.schema';
+import { ClassSchema } from '../class/schemas/class.schema';
 
 @Module({
   imports: [
@@ -14,9 +17,11 @@ import { AdminSchema } from './schemas/admin.schema';
       { name: 'Student', schema: StudentSchema },
       { name: 'Teacher', schema: TeacherSchema },
       { name: 'Admin', schema: AdminSchema },
+      { name: 'Course', schema: CourseSchema },
+      { name: 'Class', schema: ClassSchema },
     ]),
   ],
-  providers: [UserService, UserResolver],
+  providers: [UserService, UserResolver, PasswordService],
   exports: [UserService],
 })
 export class UserModule {}

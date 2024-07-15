@@ -8,6 +8,10 @@ import { Role } from 'src/auth/roles.enum';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UseGuards } from '@nestjs/common';
 import { UpdateUserDto } from './dtos/update-user.dto';
+import { AssignToTeacherDto } from './dtos/update-teacher.dto';
+import { TeacherResponseDto } from './dtos/teacher.response.dto';
+import { StudentResponseDto } from './dtos/student.response.dto';
+import { AssignToStudentDto } from './dtos/update-student.dto';
 
 @Resolver()
 export class UserResolver {
@@ -27,9 +31,9 @@ export class UserResolver {
     return await this.userService.findOneUser(id);
   }
 
-  @Mutation(() => UserResponseDto)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin)
+  @Mutation(() => UserResponseDto)
   async createUser(
     @Args('createUserDto') createUserDto: UserRequestDto,
   ): Promise<UserResponseDto> {
@@ -37,6 +41,8 @@ export class UserResolver {
     return await this.userService.createUser(createUserDto);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin, Role.Teacher, Role.Student)
   @Mutation(() => UserResponseDto)
   async updateUser(
     @Args('id') id: string,
@@ -45,8 +51,30 @@ export class UserResolver {
     return await this.userService.updateUser(id, updateUserDto);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin)
   @Mutation(() => UserResponseDto)
   async deleteUser(@Args('id') id: string): Promise<UserResponseDto> {
     return await this.userService.deleteUser(id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin)
+  @Mutation(() => TeacherResponseDto)
+  async assignToTeacher(
+    @Args('id') id: string,
+    @Args('assignToTeacherDto') assignToTeacherDto: AssignToTeacherDto,
+  ): Promise<TeacherResponseDto> {
+    return await this.userService.assignToTeacher(id, assignToTeacherDto);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin)
+  @Mutation(() => StudentResponseDto)
+  async assignToStudent(
+    @Args('id') id: string,
+    @Args('assignToStudentDto') assignToStudentDto: AssignToStudentDto,
+  ): Promise<StudentResponseDto> {
+    return await this.userService.assignToStudent(id, assignToStudentDto);
   }
 }

@@ -7,6 +7,10 @@ import { StudentResponseDto } from './dtos/student.response.dto';
 import { TeacherResponseDto } from './dtos/teacher.response.dto';
 import { AdminResponseDto } from './dtos/admin.response.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
+import { PasswordService } from './password.hash';
+import { AssignToTeacherDto } from './dtos/update-teacher.dto';
+import { CourseResponseDto } from '../course/dtos/course.response.dto';
+import { AssignToStudentDto } from './dtos/update-student.dto';
 
 @Injectable()
 export class UserService {
@@ -17,6 +21,10 @@ export class UserService {
     @InjectModel('Teacher')
     private readonly teacherModel: Model<TeacherResponseDto>,
     @InjectModel('Admin') private readonly adminModel: Model<AdminResponseDto>,
+    private readonly passwordService: PasswordService,
+    @InjectModel('Course')
+    private readonly courseModel: Model<CourseResponseDto>,
+    @InjectModel('Class') private readonly classModel: Model<CourseResponseDto>,
   ) {}
 
   async findAllUsers(): Promise<UserResponseDto[]> {
@@ -24,8 +32,8 @@ export class UserService {
       .find({
         'role.userType': { $ne: 'admin' },
       })
+      .select('-password')
       .exec();
-    console.log('allUsers', allUsers);
     if (allUsers.length === 0) {
       throw new NotFoundException('Users not found');
     }
@@ -49,6 +57,12 @@ export class UserService {
   }
 
   async createUser(createUserDto: UserRequestDto): Promise<UserResponseDto> {
+    const hashedPassword = await this.passwordService.hashPassword(
+      createUserDto.password,
+    );
+
+    createUserDto.password = hashedPassword;
+
     const newUser = new this.userModel(createUserDto);
     if (!newUser) {
       throw new NotFoundException('User not created');
@@ -75,22 +89,16 @@ export class UserService {
         userId: createdUser._id,
       });
     }
-
     const savedRecord = await relatedRecord.save();
-
     if (!savedRecord) {
       throw new NotFoundException('User save failed');
     }
-
     createdUser.role.userId = await savedRecord._id;
-
     await createdUser.save();
-
     // const popuUser = await this.userModel
     //   .findById(createdUser._id)
     //   .populate('role.userId')
     //   .exec();
-
     return createdUser;
     // return popuUser;
   }
@@ -114,18 +122,41 @@ export class UserService {
     if (!updatedUser) {
       throw new NotFoundException(`User with id ${id} update failed`);
     }
+
+    let relatedRecord;
+    if (updatedUser.role.userType === 'student') {
+      relatedRecord = await this.studentModel.findByIdAndUpdate(
+        updatedUser.role.userId,
+        { name: updateUserDto.name },
+        { new: true },
+      );
+    } else if (updatedUser.role.userType === 'teacher') {
+      relatedRecord = await this.teacherModel.findByIdAndUpdate(
+        updatedUser.role.userId,
+        { name: updateUserDto.name },
+        { new: true },
+      );
+    } else if (updatedUser.role.userType === 'admin') {
+      relatedRecord = await this.adminModel.findByIdAndUpdate(
+        updatedUser.role.userId,
+        { name: updateUserDto.name },
+        { new: true },
+      );
+    }
+
+    if (!relatedRecord) {
+      throw new NotFoundException('Update related record failed');
+    }
+
     return updatedUser;
   }
 
   async deleteUser(id: string): Promise<UserResponseDto> {
     const existingUser = await this.findOneUser(id);
-
     if (!existingUser) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
-
     const deletedUser = await this.userModel.findByIdAndDelete(id);
-
     if (!deletedUser) {
       throw new NotFoundException(`User with id ${id} delete failed`);
     }
@@ -140,11 +171,61 @@ export class UserService {
         deletedUser.role.userId,
       );
     }
-
     if (!relatedRecord) {
       throw new NotFoundException('Delete related record failed');
     }
-
     return deletedUser;
+  }
+
+  async assignToTeacher(
+    id: string,
+    updateTeacherDto: AssignToTeacherDto,
+  ): Promise<TeacherResponseDto> {
+    const existingTeacher = await this.teacherModel.findById(id);
+    if (!existingTeacher) {
+      throw new NotFoundException(`Teacher with id ${id} not found`);
+    }
+    const AssignedTeacher = await this.teacherModel.findByIdAndUpdate(
+      id,
+      updateTeacherDto,
+      { new: true },
+    );
+    if (!AssignedTeacher) {
+      throw new NotFoundException(`Teacher with id ${id} update failed`);
+    }
+    AssignedTeacher.courses.map(async (course) => {
+      await this.courseModel.findByIdAndUpdate(course, {
+        instructor: AssignedTeacher._id,
+      });
+    });
+    return AssignedTeacher;
+  }
+
+  async assignToStudent(
+    id: string,
+    updateStudentDto: AssignToStudentDto,
+  ): Promise<StudentResponseDto> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new NotFoundException('Invalid ID format');
+    }
+
+    const existingStudent = await this.studentModel.findById(id);
+    if (!existingStudent) {
+      throw new NotFoundException(`Student with id ${id} not found`);
+    }
+    const assignedStudent = await this.studentModel.findByIdAndUpdate(
+      id,
+      { studentClass: updateStudentDto.studentClass },
+      { new: true },
+    );
+    if (!assignedStudent) {
+      throw new NotFoundException(`Student with id ${id} update failed`);
+    }
+
+    await this.classModel.findByIdAndUpdate(assignedStudent.studentClass, {
+      $addToSet: { students: assignedStudent._id },
+    });
+
+    return assignedStudent;
   }
 }

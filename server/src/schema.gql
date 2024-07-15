@@ -46,6 +46,21 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type TeacherResponseDto {
+  id: ID!
+  name: UserNameResponseDto!
+  userId: String
+  courses: [ID!]
+  studentClasses: [ID!]
+}
+
+type StudentResponseDto {
+  id: ID!
+  name: UserNameResponseDto!
+  userId: String
+  studentClass: String
+}
+
 type CourseSchemaResponseDto {
   dayOfWeek: String!
   startTime: String!
@@ -64,6 +79,13 @@ type CourseResponseDto {
   studentClasses: ID
 }
 
+type ClassResponseDto {
+  id: ID!
+  name: String!
+  students: [ID!]
+  courses: [ID!]
+}
+
 type LoginResponseDto {
   token: String!
   user: UserResponseDto!
@@ -74,6 +96,8 @@ type Query {
   findOneUsers(id: String!): UserResponseDto!
   findAllCourses: [CourseResponseDto!]!
   findOneCourse(id: String!): CourseResponseDto!
+  findAllClasses: [ClassResponseDto!]!
+  findOneClass(id: String!): ClassResponseDto!
 }
 
 type Mutation {
@@ -81,9 +105,14 @@ type Mutation {
   createUser(createUserDto: UserRequestDto!): UserResponseDto!
   updateUser(id: String!, updateUserDto: UpdateUserDto!): UserResponseDto!
   deleteUser(id: String!): UserResponseDto!
+  assignToTeacher(id: String!, assignToTeacherDto: AssignToTeacherDto!): TeacherResponseDto!
+  assignToStudent(id: String!, assignToStudentDto: AssignToStudentDto!): StudentResponseDto!
   createCourse(createCourse: CourseRequestDto!): CourseResponseDto!
   updateCourse(id: String!, updateCourseDto: UpdateCourseDto!): CourseResponseDto!
   deleteCourse(id: String!): CourseResponseDto!
+  createClass(createClassDto: ClassRequestDto!): ClassResponseDto!
+  updateClass(id: String!, updateClassDto: UpdateClassDto!): ClassResponseDto!
+  deleteClass(id: String!): ClassResponseDto!
 }
 
 input LoginRequestDto {
@@ -135,6 +164,15 @@ input UpdateUserDto {
   contact: UserContactRequestDto
 }
 
+input AssignToTeacherDto {
+  courses: [ID!]
+  studentClasses: [ID!]
+}
+
+input AssignToStudentDto {
+  studentClass: String
+}
+
 input CourseRequestDto {
   name: String!
   description: String!
@@ -159,4 +197,16 @@ input UpdateCourseDto {
   courseSchedule: CourseSchemaRequestDto
   instructor: String
   studentClasses: String
+}
+
+input ClassRequestDto {
+  name: String!
+  students: [ID!]
+  courses: [ID!]
+}
+
+input UpdateClassDto {
+  name: String
+  students: [ID!]
+  courses: [ID!]
 }
