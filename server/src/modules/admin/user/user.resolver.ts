@@ -12,27 +12,30 @@ import { AssignToTeacherDto } from './dtos/update-teacher.dto';
 import { TeacherResponseDto } from './dtos/teacher.response.dto';
 import { StudentResponseDto } from './dtos/student.response.dto';
 import { AssignToStudentDto } from './dtos/update-student.dto';
+import { FindUsersRequestDto } from './dtos/find-users.request.dto';
 
 @Resolver()
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.Admin)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.Admin)
   @Query(() => [UserResponseDto])
-  async findAllUsers(): Promise<UserResponseDto[]> {
-    return await this.userService.findAllUsers();
+  async findAllUsers(
+    @Args('condition', { nullable: true }) condition?: FindUsersRequestDto,
+  ): Promise<UserResponseDto[]> {
+    return await this.userService.findAllUsers(condition);
   }
 
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.Admin, Role.Teacher, Role.Student)
   @Query(() => UserResponseDto)
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.Admin, Role.Teacher, Role.Student)
   async findOneUsers(@Args('id') id: string): Promise<UserResponseDto> {
     return await this.userService.findOneUser(id);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.Admin)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.Admin)
   @Mutation(() => UserResponseDto)
   async createUser(
     @Args('createUserDto') createUserDto: UserRequestDto,
@@ -41,8 +44,8 @@ export class UserResolver {
     return await this.userService.createUser(createUserDto);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.Admin, Role.Teacher, Role.Student)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.Admin, Role.Teacher, Role.Student)
   @Mutation(() => UserResponseDto)
   async updateUser(
     @Args('id') id: string,
@@ -51,15 +54,15 @@ export class UserResolver {
     return await this.userService.updateUser(id, updateUserDto);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.Admin)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.Admin)
   @Mutation(() => UserResponseDto)
   async deleteUser(@Args('id') id: string): Promise<UserResponseDto> {
     return await this.userService.deleteUser(id);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.Admin)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.Admin)
   @Mutation(() => TeacherResponseDto)
   async assignToTeacher(
     @Args('id') id: string,
@@ -68,8 +71,8 @@ export class UserResolver {
     return await this.userService.assignToTeacher(id, assignToTeacherDto);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.Admin)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.Admin)
   @Mutation(() => StudentResponseDto)
   async assignToStudent(
     @Args('id') id: string,

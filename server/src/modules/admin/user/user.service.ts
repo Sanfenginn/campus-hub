@@ -7,10 +7,12 @@ import { StudentResponseDto } from './dtos/student.response.dto';
 import { TeacherResponseDto } from './dtos/teacher.response.dto';
 import { AdminResponseDto } from './dtos/admin.response.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { PasswordService } from './password.hash';
+import { PasswordService } from './services/password.service';
 import { AssignToTeacherDto } from './dtos/update-teacher.dto';
 import { CourseResponseDto } from '../course/dtos/course.response.dto';
 import { AssignToStudentDto } from './dtos/update-student.dto';
+import { ClassResponseDto } from '../class/dtos/class.response.dto';
+import { FindUsersRequestDto } from './dtos/find-users.request.dto';
 
 @Injectable()
 export class UserService {
@@ -24,19 +26,33 @@ export class UserService {
     private readonly passwordService: PasswordService,
     @InjectModel('Course')
     private readonly courseModel: Model<CourseResponseDto>,
-    @InjectModel('Class') private readonly classModel: Model<CourseResponseDto>,
+    @InjectModel('Class') private readonly classModel: Model<ClassResponseDto>,
   ) {}
 
-  async findAllUsers(): Promise<UserResponseDto[]> {
+  async findAllUsers(
+    condition?: FindUsersRequestDto,
+  ): Promise<UserResponseDto[]> {
+    const query: any = { $and: [{ 'role.userType': { $ne: 'admin' } }] };
+    if (condition.Role) {
+      query.$and.push({ 'role.userType': condition.Role });
+    } else if (condition.Name) {
+      query.$and.push({
+        $or: [
+          { 'name.firstName': { $regex: condition.Name, $options: 'i' } },
+          { 'name.lastName': { $regex: condition.Name, $options: 'i' } },
+        ],
+      });
+    } else if (condition.Account) {
+      query.$and.push({
+        account: { $regex: condition.Account, $options: 'i' },
+      });
+    }
+
     const allUsers = await this.userModel
-      .find({
-        'role.userType': { $ne: 'admin' },
-      })
+      .find(query)
       .select('-password')
       .exec();
-    if (allUsers.length === 0) {
-      throw new NotFoundException('Users not found');
-    }
+
     return allUsers;
   }
 
@@ -122,7 +138,6 @@ export class UserService {
     if (!updatedUser) {
       throw new NotFoundException(`User with id ${id} update failed`);
     }
-
     let relatedRecord;
     if (updatedUser.role.userType === 'student') {
       relatedRecord = await this.studentModel.findByIdAndUpdate(
@@ -143,11 +158,9 @@ export class UserService {
         { new: true },
       );
     }
-
     if (!relatedRecord) {
       throw new NotFoundException('Update related record failed');
     }
-
     return updatedUser;
   }
 
@@ -160,16 +173,28 @@ export class UserService {
     if (!deletedUser) {
       throw new NotFoundException(`User with id ${id} delete failed`);
     }
-
     let relatedRecord;
     if (deletedUser.role.userType === 'student') {
       relatedRecord = await this.studentModel.findByIdAndDelete(
         deletedUser.role.userId,
       );
+      await this.classModel.findByIdAndUpdate(relatedRecord.studentClass, {
+        $pull: { students: relatedRecord._id },
+      });
     } else if (deletedUser.role.userType === 'teacher') {
       relatedRecord = await this.teacherModel.findByIdAndDelete(
         deletedUser.role.userId,
       );
+      relatedRecord.courses.map(async (course) => {
+        await this.courseModel.findByIdAndUpdate(course, {
+          instructor: null,
+        });
+      });
+      relatedRecord.studentClasses.map(async (studentClass) => {
+        await this.classModel.findByIdAndUpdate(studentClass, {
+          $pull: { teachers: relatedRecord._id },
+        });
+      });
     }
     if (!relatedRecord) {
       throw new NotFoundException('Delete related record failed');

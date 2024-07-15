@@ -5,10 +5,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from './schemas/user.schema';
 import { StudentSchema } from './schemas/student.schema';
 import { TeacherSchema } from './schemas/teacher.schema';
-import { AdminSchema } from './schemas/admin.schema';
-import { PasswordService } from './password.hash';
-import { CourseSchema } from '../course/schemas/course.schema';
 import { ClassSchema } from '../class/schemas/class.schema';
+import { AdminSchema } from './schemas/admin.schema';
+import { PasswordService } from './services/password.service';
+import { CourseSchema } from '../course/schemas/course.schema';
 
 @Module({
   imports: [

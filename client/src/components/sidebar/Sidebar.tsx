@@ -21,7 +21,6 @@ const Sidebar: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
   const [options, setOptions] = useState<Option[]>([]);
-  const [loginInfo, setLoginInfo] = useState<any>({});
 
   useEffect(() => {
     const loginInfo = JSON.parse(localStorage.getItem("loginInfo") ?? "{}");
@@ -31,9 +30,10 @@ const Sidebar: React.FC = () => {
     }
   }, [pathname]);
 
-  console.log("options", options);
+  // console.log("options", options);
 
   const handleOptionClick = (pathname: string) => {
+    console.log("pathname", pathname);
     router.push(pathname);
   };
 

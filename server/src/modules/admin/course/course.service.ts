@@ -4,11 +4,15 @@ import { Model, Types } from 'mongoose';
 import { CourseRequestDto } from './dtos/course.request.dto';
 import { CourseResponseDto } from './dtos/course.response.dto';
 import { UpdateCourseDto } from './dtos/update.course.dto';
+import { TeacherResponseDto } from '../user/dtos/teacher.response.dto';
+import { ClassResponseDto } from '../class/dtos/class.response.dto';
 
 @Injectable()
 export class CourseService {
   constructor(
     @InjectModel('Course') private courseModel: Model<CourseResponseDto>,
+    @InjectModel('Teacher') private teacherModel: Model<TeacherResponseDto>,
+    @InjectModel('Class') private classModel: Model<ClassResponseDto>,
   ) {}
 
   async findAllCourses(): Promise<CourseResponseDto[]> {
@@ -41,6 +45,32 @@ export class CourseService {
     if (!createdCourse) {
       throw new NotFoundException('Course save failed');
     }
+
+    if (createdCourse.instructor) {
+      await this.teacherModel.findByIdAndUpdate(
+        createdCourse.instructor,
+        {
+          $addToSet: { courses: createdCourse._id },
+        },
+        { new: true },
+      );
+
+      if (
+        createdCourse.studentClasses &&
+        createdCourse.studentClasses.length > 0
+      ) {
+        createdCourse.studentClasses.forEach(async (classId) => {
+          await this.classModel.findByIdAndUpdate(
+            classId,
+            {
+              $addToSet: { courses: createdCourse._id },
+            },
+            { new: true },
+          );
+        });
+      }
+    }
+
     return createdCourse;
   }
 
@@ -63,6 +93,32 @@ export class CourseService {
     if (!updatedCourse) {
       throw new NotFoundException('Course update failed');
     }
+
+    if (updateCourseDto.instructor) {
+      await this.teacherModel.findByIdAndUpdate(
+        updateCourseDto.instructor,
+        {
+          $addToSet: { courses: updatedCourse._id },
+        },
+        { new: true },
+      );
+
+      if (
+        updateCourseDto.studentClasses &&
+        updateCourseDto.studentClasses.length > 0
+      ) {
+        updateCourseDto.studentClasses.forEach(async (classId) => {
+          await this.classModel.findByIdAndUpdate(
+            classId,
+            {
+              $addToSet: { courses: updatedCourse._id },
+            },
+            { new: true },
+          );
+        });
+      }
+    }
+
     return updatedCourse;
   }
 
@@ -78,6 +134,32 @@ export class CourseService {
     if (!deletedCourse) {
       throw new NotFoundException('Course delete failed');
     }
+
+    if (deletedCourse.instructor) {
+      await this.teacherModel.findByIdAndUpdate(
+        deletedCourse.instructor,
+        {
+          $pull: { courses: deletedCourse._id },
+        },
+        { new: true },
+      );
+
+      if (
+        deletedCourse.studentClasses &&
+        deletedCourse.studentClasses.length > 0
+      ) {
+        deletedCourse.studentClasses.forEach(async (classId) => {
+          await this.classModel.findByIdAndUpdate(
+            classId,
+            {
+              $pull: { courses: deletedCourse._id },
+            },
+            { new: true },
+          );
+        });
+      }
+    }
+
     return deletedCourse;
   }
 }

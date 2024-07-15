@@ -13,22 +13,22 @@ import { UseGuards } from '@nestjs/common';
 export class ClassResolver {
   constructor(private readonly classService: ClassService) {}
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.Admin, Role.Teacher)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.Admin, Role.Teacher)
   @Query(() => [ClassResponseDto])
   async findAllClasses(): Promise<ClassResponseDto[]> {
     return await this.classService.findAllClasses();
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.Admin, Role.Teacher)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.Admin, Role.Teacher)
   @Query(() => ClassResponseDto)
   async findOneClass(@Args('id') id: string): Promise<ClassResponseDto> {
     return await this.classService.findOneClass(id);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.Admin)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.Admin)
   @Mutation(() => ClassResponseDto)
   async createClass(
     @Args('createClassDto') createClassDto: ClassRequestDto,
@@ -36,8 +36,8 @@ export class ClassResolver {
     return await this.classService.createClass(createClassDto);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.Admin)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.Admin)
   @Mutation(() => ClassResponseDto)
   async updateClass(
     @Args('id') id: string,
@@ -46,8 +46,8 @@ export class ClassResolver {
     return await this.classService.updateClass(id, updateClassDto);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.Admin)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.Admin)
   @Mutation(() => ClassResponseDto)
   async deleteClass(@Args('id') id: string): Promise<ClassResponseDto> {
     return await this.classService.deleteClass(id);

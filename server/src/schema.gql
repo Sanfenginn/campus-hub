@@ -76,7 +76,7 @@ type CourseResponseDto {
   classroom: String!
   courseSchedule: CourseSchemaResponseDto!
   instructor: ID
-  studentClasses: ID
+  studentClasses: [ID!]
 }
 
 type ClassResponseDto {
@@ -86,18 +86,30 @@ type ClassResponseDto {
   courses: [ID!]
 }
 
+type Role {
+  userType: String!
+  userId: String!
+}
+
 type LoginResponseDto {
   token: String!
-  user: UserResponseDto!
+  role: Role!
 }
 
 type Query {
-  findAllUsers: [UserResponseDto!]!
+  findAllUsers(condition: FindUsersRequestDto): [UserResponseDto!]!
   findOneUsers(id: String!): UserResponseDto!
   findAllCourses: [CourseResponseDto!]!
   findOneCourse(id: String!): CourseResponseDto!
   findAllClasses: [ClassResponseDto!]!
   findOneClass(id: String!): ClassResponseDto!
+}
+
+input FindUsersRequestDto {
+  Role: String
+  Name: String
+  Account: String
+  deptClass: String
 }
 
 type Mutation {
@@ -179,7 +191,7 @@ input CourseRequestDto {
   classroom: String!
   courseSchedule: CourseSchemaRequestDto!
   instructor: String
-  studentClasses: String
+  studentClasses: [ID!]
 }
 
 input CourseSchemaRequestDto {
@@ -196,7 +208,7 @@ input UpdateCourseDto {
   classroom: String
   courseSchedule: CourseSchemaRequestDto
   instructor: String
-  studentClasses: String
+  studentClasses: [ID!]
 }
 
 input ClassRequestDto {

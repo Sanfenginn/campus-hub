@@ -4,16 +4,16 @@ import { useRouter } from "next/navigation";
 import CustomButton from "@/components/common/Button";
 import CustomTextField from "@/components/common/TextField";
 import { initializeApollo } from "@/lib/apolloClient";
-import useLogin from "@/graphql/useLogin";
-
+import { LOGIN } from "@/graphql/auth";
+import { useMutation } from "@apollo/client";
 import config from "@/config/config.json";
 
 type UserType = "admin" | "student" | "teacher";
 
 const LoginForm: React.FC = () => {
+  const [login, { loading, error }] = useMutation(LOGIN);
   const apolloClient = initializeApollo();
   const router = useRouter();
-  const { loginFn } = useLogin();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -21,15 +21,24 @@ const LoginForm: React.FC = () => {
     const account = formData.get("account") as string;
     const password = formData.get("password") as string;
 
+    console.log("account: ", account);
+    console.log("password: ", password);
+
     try {
-      const response = await loginFn(account, password);
-      const userType: UserType = response.userType;
+      const input = {
+        account,
+        password,
+      };
+
+      const response = await login({ variables: { input } });
+      // console.log("response: ", response);
+      const userType: UserType = response.data.login.role.userType;
       const userConfig = config[userType] || {};
       const settings = config.settings || {};
 
       const loginData = {
-        account: response.account,
-        token: response.token,
+        account: response.data.account,
+        token: response.data.login.token,
         userType: userType,
         userConfig: userConfig,
         settings: settings,
@@ -49,6 +58,8 @@ const LoginForm: React.FC = () => {
       console.error(err);
     }
   };
+
+  if (error) return <p>Error: {error.message}</p>;
 
   return (
     <Container component="main" maxWidth="xs">

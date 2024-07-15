@@ -25,6 +25,6 @@ export class CourseResponseDto {
   @Field(() => ID, { nullable: true })
   instructor?: string;
 
-  @Field(() => ID, { nullable: true })
-  studentClasses?: string;
+  @Field(() => [ID], { nullable: true })
+  studentClasses?: string[];
 }

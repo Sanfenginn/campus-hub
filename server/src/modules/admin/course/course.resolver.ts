@@ -13,22 +13,22 @@ import { UseGuards } from '@nestjs/common';
 export class CourseResolver {
   constructor(private readonly courseService: CourseService) {}
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.Admin, Role.Teacher, Role.Student)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.Admin, Role.Teacher, Role.Student)
   @Query(() => [CourseResponseDto])
   async findAllCourses(): Promise<CourseResponseDto[]> {
     return this.courseService.findAllCourses();
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.Admin, Role.Teacher, Role.Student)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.Admin, Role.Teacher, Role.Student)
   @Query(() => CourseResponseDto)
   async findOneCourse(@Args('id') id: string): Promise<CourseResponseDto> {
     return await this.courseService.findOneCourse(id);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.Admin)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.Admin)
   @Mutation(() => CourseResponseDto)
   async createCourse(
     @Args('createCourse') createCourse: CourseRequestDto,
@@ -36,8 +36,8 @@ export class CourseResolver {
     return await this.courseService.createCourse(createCourse);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.Admin)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.Admin)
   @Mutation(() => CourseResponseDto)
   async updateCourse(
     @Args('id') id: string,
@@ -46,8 +46,8 @@ export class CourseResolver {
     return await this.courseService.updateCourse(id, updateCourseDto);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.Admin)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.Admin)
   @Mutation(() => CourseResponseDto)
   async deleteCourse(@Args('id') id: string): Promise<CourseResponseDto> {
     return await this.courseService.deleteCourse(id);

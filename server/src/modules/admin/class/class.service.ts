@@ -4,11 +4,17 @@ import { Model, Types } from 'mongoose';
 import { ClassRequestDto } from './dtos/class.request.dto';
 import { ClassResponseDto } from './dtos/class.response.dto';
 import { UpdateClassDto } from './dtos/update.class.dto';
+import { StudentResponseDto } from '../user/dtos/student.response.dto';
+import { CourseResponseDto } from '../course/dtos/course.response.dto';
 
 @Injectable()
 export class ClassService {
   constructor(
     @InjectModel('Class') private readonly classModel: Model<ClassResponseDto>,
+    @InjectModel('Student')
+    private readonly studentModel: Model<StudentResponseDto>,
+    @InjectModel('Course')
+    private readonly courseModel: Model<CourseResponseDto>,
   ) {}
 
   async findAllClasses(): Promise<ClassResponseDto[]> {
@@ -41,6 +47,30 @@ export class ClassService {
     if (!createdClass) {
       throw new NotFoundException('Class save failed');
     }
+
+    if (createdClass.students && createdClass.students.length > 0) {
+      createdClass.students.forEach(async (studentId) => {
+        await this.studentModel.findByIdAndUpdate(
+          studentId,
+          {
+            studentClass: createdClass._id,
+          },
+          { new: true },
+        );
+      });
+    }
+
+    if (createdClass.courses && createdClass.courses.length > 0) {
+      createdClass.courses.forEach(async (courseId) => {
+        await this.courseModel.findByIdAndUpdate(
+          courseId,
+          {
+            $addToSet: { studentClasses: createdClass._id },
+          },
+          { new: true },
+        );
+      });
+    }
     return createdClass;
   }
 
@@ -67,6 +97,30 @@ export class ClassService {
       throw new NotFoundException('Class update failed');
     }
 
+    if (updatedClass.students && updatedClass.students.length > 0) {
+      updatedClass.students.forEach(async (studentId) => {
+        await this.studentModel.findByIdAndUpdate(
+          studentId,
+          {
+            studentClass: updatedClass._id,
+          },
+          { new: true },
+        );
+      });
+    }
+
+    if (updatedClass.courses && updatedClass.courses.length > 0) {
+      updatedClass.courses.forEach(async (courseId) => {
+        await this.courseModel.findByIdAndUpdate(
+          courseId,
+          {
+            $addToSet: { studentClasses: updatedClass._id },
+          },
+          { new: true },
+        );
+      });
+    }
+
     return updatedClass;
   }
 
@@ -83,6 +137,30 @@ export class ClassService {
     const deletedClass = await this.classModel.findByIdAndDelete(id);
     if (!deletedClass) {
       throw new NotFoundException('Class delete failed');
+    }
+
+    if (deletedClass.students && deletedClass.students.length > 0) {
+      deletedClass.students.forEach(async (studentId) => {
+        await this.studentModel.findByIdAndUpdate(
+          studentId,
+          {
+            studentClass: null,
+          },
+          { new: true },
+        );
+      });
+    }
+
+    if (deletedClass.courses && deletedClass.courses.length > 0) {
+      deletedClass.courses.forEach(async (courseId) => {
+        await this.courseModel.findByIdAndUpdate(
+          courseId,
+          {
+            $pull: { studentClasses: deletedClass._id },
+          },
+          { new: true },
+        );
+      });
     }
 
     return deletedClass;

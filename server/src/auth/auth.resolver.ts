@@ -16,9 +16,9 @@ export class AuthResolver {
     @Context() context,
   ): Promise<LoginResponseDto> {
     const user = context.req.user._doc; // 从上下文中获取已验证的用户对象，不要用从请求中获取的用户对象
-    console.log('user in resolver: ', user);
+    // console.log('user in resolver: ', user);
     const token = await this.authService.login(user);
-    const newUser = { ...user, id: user._id.toString() };
-    return { user: newUser, token };
+    const role = user.role;
+    return { role, token };
   }
 }

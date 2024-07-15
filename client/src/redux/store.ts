@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { thunk } from "redux-thunk"; // 导入命名导出 thunk
 import loginInfoReducer from "./loginInfo";
+import usersDataReducer from "./usersData";
 
 // 配置 store
 const store = configureStore({
   reducer: {
     loginInfo: loginInfoReducer,
+    usersData: usersDataReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

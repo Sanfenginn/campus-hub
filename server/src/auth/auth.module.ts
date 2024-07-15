@@ -9,7 +9,7 @@ import { LocalStrategy } from './local.strategy';
 import { AuthResolver } from './auth.resolver';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { LocalAuthGuard } from './local-auth.guard';
-import { PasswordService } from '../modules/admin/user/password.hash';
+import { PasswordService } from '../modules/admin/user/services/password.service';
 
 @Global()
 @Module({

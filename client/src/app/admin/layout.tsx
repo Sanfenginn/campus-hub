@@ -9,13 +9,11 @@ const AdminMainLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
   return (
     <div className="flex flex-col  items-center h-screen ">
       <Navbar />
-      <div className=" w-[80vw] h-full flex-grow  flex  overflow-scroll">
-        <div className="flex-[1.5] ">
+      <div className="w-full h-full flex-grow flex  justify-center  ">
+        <div className="">
           <ConditionalSidebar />
         </div>
-        <main className="h-full flex-[7] border-2 border-yellow-500">
-          {children}
-        </main>
+        <main className="p-4 w-[80vw] ">{children}</main>
       </div>
     </div>
   );

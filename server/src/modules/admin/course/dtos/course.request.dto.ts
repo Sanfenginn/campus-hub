@@ -1,5 +1,5 @@
 import { CourseSchemaRequestDto } from './courseSchedule.dto';
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, ID } from '@nestjs/graphql';
 import { IsString, IsDate, ValidateNested, IsNotEmpty } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -30,6 +30,6 @@ export class CourseRequestDto {
   instructor?: string;
 
   @IsString()
-  @Field({ nullable: true })
-  studentClasses?: string;
+  @Field(() => [ID], { nullable: true })
+  studentClasses?: string[];
 }
