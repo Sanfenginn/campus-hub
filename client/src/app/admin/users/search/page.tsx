@@ -3,7 +3,7 @@ import SearchUsers from "@/components/search-users/SearchUser";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setUsersData } from "@/redux/usersData";
-import { FIND_USERS } from "@/graphql/getUsers";
+import { FIND_USERS } from "@/graphql/users";
 import { useApolloClient } from "@apollo/client";
 
 const UsersSearchPage: React.FC = () => {

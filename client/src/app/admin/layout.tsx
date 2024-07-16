@@ -1,9 +1,5 @@
-import dynamic from "next/dynamic";
-
-const Navbar = dynamic(() => import("@/components/navbar/Navbar"));
-const ConditionalSidebar = dynamic(
-  () => import("@/components/sidebar/ConditionalSidebar")
-);
+import Navbar from "@/components/navbar/Navbar";
+import ConditionalSidebar from "@/components/sidebar/ConditionalSidebar";
 
 const AdminMainLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
   return (

@@ -19,6 +19,7 @@ export class AuthResolver {
     // console.log('user in resolver: ', user);
     const token = await this.authService.login(user);
     const role = user.role;
-    return { role, token };
+    const name = user.name;
+    return { name, role, token };
   }
 }

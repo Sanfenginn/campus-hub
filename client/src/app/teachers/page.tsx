@@ -1,9 +1,4 @@
-import dynamic from "next/dynamic";
-
-const DashboardPage = dynamic(() => import("@/app/teachers/dashboard/page"), {
-  loading: () => <p>Loading...</p>,
-  //   ssr: false,
-});
+import DashboardPage from "@/app/teachers/dashboard/page";
 
 const TeachersMainPage: React.FC = () => {
   return <DashboardPage />;

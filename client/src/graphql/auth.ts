@@ -8,6 +8,10 @@ export const LOGIN = gql`
         userType
         userId
       }
+      name {
+        firstName
+        lastName
+      }
     }
   }
 `;

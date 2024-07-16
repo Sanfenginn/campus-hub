@@ -11,6 +11,15 @@ class Role {
 }
 
 @ObjectType()
+class Name {
+  @Field()
+  firstName: string;
+
+  @Field()
+  lastName: string;
+}
+
+@ObjectType()
 export class LoginResponseDto {
   @Field()
   token: string;
@@ -18,6 +27,6 @@ export class LoginResponseDto {
   @Field(() => Role)
   role: Role;
 
-  // @Field(() => UserResponseDto)
-  // user: UserResponseDto;
+  @Field(() => Name)
+  name: Name;
 }

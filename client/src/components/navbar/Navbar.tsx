@@ -19,17 +19,15 @@ const Navbar: React.FC = () => {
   const [loginInfo, setLoginInfo] = useState<any>({});
 
   useEffect(() => {
-    const loginInfo = JSON.parse(localStorage.getItem("loginInfo") ?? "{}");
-    if (loginInfo) {
-      setPages(loginInfo.userConfig?.navbar || []);
-      setSettings(loginInfo.settings || []);
-      setLoginInfo(loginInfo || {});
+    if (typeof window !== "undefined") {
+      const loginInfo = JSON.parse(localStorage.getItem("loginInfo") ?? "{}");
+      if (loginInfo) {
+        setPages(loginInfo.userConfig?.navbar || []);
+        setSettings(loginInfo.settings || []);
+        setLoginInfo(loginInfo || {});
+      }
     }
-    // console.log("loginInfo", loginInfo);
   }, []);
-
-  // console.log("pages", pages);
-  // console.log("settings", settings);
 
   const handleTitleClick = () => {
     const newPathname = pathname.split("/")[1];

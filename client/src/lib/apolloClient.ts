@@ -1,6 +1,8 @@
 import { ApolloClient, InMemoryCache, HttpLink, split } from "@apollo/client";
 import { WebSocketLink } from "@apollo/client/link/ws";
 import { getMainDefinition } from "@apollo/client/utilities";
+import { onError } from "@apollo/client/link/error";
+import { ApolloLink } from "@apollo/client/link/core";
 
 let apolloClient: ApolloClient<any>;
 
@@ -37,9 +39,27 @@ function createApolloClient() {
         )
       : httpLink;
 
+  // 创建错误处理链接
+  const errorLink = onError(({ graphQLErrors, networkError }) => {
+    if (graphQLErrors) {
+      graphQLErrors.forEach(({ message, locations, path }) => {
+        console.error(
+          `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
+        );
+      });
+    }
+
+    if (networkError) {
+      console.error(`[Network error]: ${networkError}`);
+    }
+  });
+
+  // 将错误处理链接添加到 Apollo 链接中
+  const link = ApolloLink.from([errorLink, splitLink]);
+
   return new ApolloClient({
     ssrMode: typeof window === "undefined",
-    link: splitLink,
+    link: link,
     cache: new InMemoryCache(),
   });
 }

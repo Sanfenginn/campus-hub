@@ -53,6 +53,12 @@ export class UserService {
       .select('-password')
       .exec();
 
+    // console.log('allUsers:', allUsers);
+
+    // if (allUsers.length === 0) {
+    //   throw new NotFoundException('Users not found');
+    // }
+
     return allUsers;
   }
 

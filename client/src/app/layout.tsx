@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import dynamic from "next/dynamic";
+import ProviderWrapper from "../lib/ProviderWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
-
-const ProviderWrapper = dynamic(() => import("../lib/ProviderWrapper"));
 
 export const metadata: Metadata = {
   title: "Campus Hub",

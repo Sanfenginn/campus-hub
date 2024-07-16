@@ -1,6 +1,17 @@
+"use client";
 import { Card, CardContent, Typography, Box } from "@mui/material";
+import { useEffect, useState } from "react";
 
 const DashboardPage: React.FC = () => {
+  const [firstName, setFirstName] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const loginInfo = JSON.parse(localStorage.getItem("loginInfo") ?? "{}");
+      setFirstName(loginInfo?.name?.firstName || "");
+    }
+  }, []);
+
   return (
     <Box
       className="h-full"
@@ -20,12 +31,12 @@ const DashboardPage: React.FC = () => {
             align="center"
             sx={{ fontWeight: "bold" }}
           >
-            Welcome to Dashboard
+            {`Welcome back, ${firstName}!`}
           </Typography>
-          <Typography variant="body1" color="text.secondary" align="center">
-            This is your central hub for managing your activities and getting
-            the latest updates. Explore the features and have a great
-            experience!
+          <Typography variant="body1" color="text.secondary" align="left">
+            Welcome to our Campus Hub System, a comprehensive solution designed
+            to streamline administrative tasks and improve the overall
+            efficiency of our educational institution.
           </Typography>
         </CardContent>
       </Card>

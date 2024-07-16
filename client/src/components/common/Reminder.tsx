@@ -1,7 +1,7 @@
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { useSelector } from "react-redux";
-import { RootState } from "@/app/redux/store";
+import { RootState } from "@/redux/store";
 
 type EditUsersButtonsProps = {
   show: boolean;
@@ -14,30 +14,20 @@ const ReminderForSelection: React.FC<EditUsersButtonsProps> = ({
 }) => {
   const reminder = useSelector((state: RootState) => state.reminder.reminder);
 
-  const getMessage = () => {
-    if (reminder === "permission settings") {
-      return "No permissions are changed!";
-    }
-    if (reminder === "upload files") {
-      return "Please upload the files before submitting them!";
-    }
+  // console.log("reminder:", reminder);
 
-    if (reminder === "edit user no") {
-      return "No user is selected!";
-    }
-
-    if (reminder === "edit user more") {
-      return "Only one user can be edited at a time!";
-    }
-
-    if (reminder === "edit course more") {
-      return "Only one course can be edited at a time!";
-    }
-
-    if (reminder === "edit course no") {
-      return "No course is selected!";
-    }
-  };
+  let message = "";
+  switch (reminder) {
+    case "row=0":
+      message = "Please select at least one row data!";
+      break;
+    case "row>1":
+      message = "Please select only one row data!";
+      break;
+    default:
+      message = "";
+      break;
+  }
 
   return (
     <div>
@@ -53,7 +43,7 @@ const ReminderForSelection: React.FC<EditUsersButtonsProps> = ({
           variant="filled"
           sx={{ width: "100%" }}
         >
-          {getMessage()}
+          {message}
         </Alert>
       </Snackbar>
     </div>

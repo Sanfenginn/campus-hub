@@ -1,8 +1,4 @@
-import dynamic from "next/dynamic";
-
-const LoginPage = dynamic(() => import("@/app/login/page"), {
-  loading: () => <p>Loading...</p>,
-});
+import LoginPage from "@/app/login/page";
 
 const HomePage: React.FC = () => {
   return <LoginPage />;

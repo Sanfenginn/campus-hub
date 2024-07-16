@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { setUsersData } from "@/redux/usersData";
 // import { setCoursesData } from "@/app/redux/coursesData";
 import getPathName from "@/utils/getPathName";
-import { FIND_USERS } from "@/graphql/getUsers";
+import { FIND_USERS } from "@/graphql/users";
 import { useApolloClient } from "@apollo/client";
 
 type InputBoxProps = {
@@ -17,11 +17,6 @@ interface ApiResponse {
   data: {
     message: any[]; // 根据实际返回的数据类型调整
   };
-}
-
-interface InputType {
-  condition?: string;
-  inputValue: string;
 }
 
 const InputBox: React.FC<InputBoxProps> = ({ condition }) => {
@@ -44,7 +39,7 @@ const InputBox: React.FC<InputBoxProps> = ({ condition }) => {
   const handleSubmit = async () => {
     setLoading(true);
     let conditionVar = {};
-    if (condition !== "") {
+    if (condition && condition !== "") {
       conditionVar = { [condition]: inputValue };
     }
 
@@ -54,7 +49,7 @@ const InputBox: React.FC<InputBoxProps> = ({ condition }) => {
 
     try {
       if (pathName === "/admin/users" || pathName === "/admin/users/search") {
-        const { data, error } = await client.query({
+        const { data } = await client.query({
           query: FIND_USERS,
           variables: { conditionVar },
         });

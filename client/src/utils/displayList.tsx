@@ -2,7 +2,7 @@ import { User, Course } from "@/types/displayList";
 import { GridColDef } from "@mui/x-data-grid";
 
 export const getRows = (pathName: string, data: any): any[] => {
-  let rows = {};
+  let rows: any[] = [];
 
   if (pathName === "/admin/users" || pathName === "/admin/users/search") {
     rows = data.map((user: User) => {

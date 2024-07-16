@@ -3,26 +3,23 @@ import { Box, Typography, Container, CssBaseline } from "@mui/material";
 import { useRouter } from "next/navigation";
 import CustomButton from "@/components/common/Button";
 import CustomTextField from "@/components/common/TextField";
-import { initializeApollo } from "@/lib/apolloClient";
 import { LOGIN } from "@/graphql/auth";
 import { useMutation } from "@apollo/client";
 import config from "@/config/config.json";
+import { useState } from "react";
 
 type UserType = "admin" | "student" | "teacher";
 
 const LoginForm: React.FC = () => {
-  const [login, { loading, error }] = useMutation(LOGIN);
-  const apolloClient = initializeApollo();
+  const [login, { error }] = useMutation(LOGIN);
   const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const account = formData.get("account") as string;
     const password = formData.get("password") as string;
-
-    console.log("account: ", account);
-    console.log("password: ", password);
 
     try {
       const input = {
@@ -37,14 +34,18 @@ const LoginForm: React.FC = () => {
       const settings = config.settings || {};
 
       const loginData = {
-        account: response.data.account,
         token: response.data.login.token,
         userType: userType,
         userConfig: userConfig,
         settings: settings,
+        name: response.data.login.name,
       };
 
-      localStorage.setItem("loginInfo", JSON.stringify(loginData));
+      // console.log("loginData: ", loginData);
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem("loginInfo", JSON.stringify(loginData));
+      }
 
       // 在登录成功后跳转到系统主界面
       if (userType === "admin") {

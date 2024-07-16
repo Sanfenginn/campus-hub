@@ -1,4 +1,6 @@
-const StudentsMainLayout: React.FC = ({ children }) => {
+const StudentsMainLayout: React.FC<React.PropsWithChildren> = ({
+  children,
+}) => {
   return (
     <div>
       <h1>Students Page</h1>

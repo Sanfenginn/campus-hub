@@ -2,6 +2,7 @@ import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogTitle from "@mui/material/DialogTitle";
+import { useEffect, useState } from "react";
 
 interface ConfirmDeleteProps {
   show: boolean;
@@ -14,26 +15,34 @@ const ConfirmDelete: React.FC<ConfirmDeleteProps> = ({
   handleClose,
   onConfirm,
 }) => {
+  const [condition, setCondition] = useState("item");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const currentPage = localStorage.getItem("currentPage");
+      console.log("currentPage:", currentPage);
+
+      switch (currentPage) {
+        case "users":
+          setCondition("users");
+          break;
+        case "courses":
+          setCondition("courses");
+          break;
+        default:
+          setCondition("item");
+      }
+
+      console.log("condition:", condition);
+    }
+  }, [show]);
+
+  console.log("condition:", condition);
+
   const handleClickYes = () => {
     onConfirm();
     handleClose();
   };
-  const currentPage = localStorage.getItem("currentPage");
-  console.log("currentPage:", currentPage);
-
-  let condition = "";
-  switch (currentPage) {
-    case "users":
-      condition = "users";
-      break;
-    case "courses":
-      condition = "courses";
-      break;
-    default:
-      condition = "item";
-  }
-
-  console.log("condition:", condition);
 
   return (
     <Dialog

@@ -23,10 +23,12 @@ const Sidebar: React.FC = () => {
   const [options, setOptions] = useState<Option[]>([]);
 
   useEffect(() => {
-    const loginInfo = JSON.parse(localStorage.getItem("loginInfo") ?? "{}");
-    if (loginInfo) {
-      const currentPage = loginInfo.currentPage || "";
-      setOptions(loginInfo.userConfig?.sidebar?.[currentPage] || []);
+    if (typeof window !== "undefined") {
+      const loginInfo = JSON.parse(localStorage.getItem("loginInfo") ?? "{}");
+      if (loginInfo) {
+        const currentPage = loginInfo.currentPage || "";
+        setOptions(loginInfo.userConfig?.sidebar?.[currentPage] || []);
+      }
     }
   }, [pathname]);
 
