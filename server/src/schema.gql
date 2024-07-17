@@ -61,6 +61,12 @@ type StudentResponseDto {
   studentClass: String
 }
 
+type DeleteUsersResponseDto {
+  message: String!
+  results: [UserResponseDto!]!
+  errors: [String!]
+}
+
 type CourseSchemaResponseDto {
   dayOfWeek: String!
   startTime: String!
@@ -122,7 +128,7 @@ type Mutation {
   login(input: LoginRequestDto!): LoginResponseDto!
   createUser(createUserDto: UserRequestDto!): UserResponseDto!
   updateUser(id: String!, updateUserDto: UpdateUserDto!): UserResponseDto!
-  deleteUser(id: String!): UserResponseDto!
+  deleteUsers(id: [String!]!): DeleteUsersResponseDto!
   assignToTeacher(id: String!, assignToTeacherDto: AssignToTeacherDto!): TeacherResponseDto!
   assignToStudent(id: String!, assignToStudentDto: AssignToStudentDto!): StudentResponseDto!
   createCourse(createCourse: CourseRequestDto!): CourseResponseDto!
@@ -227,4 +233,9 @@ input UpdateClassDto {
   name: String
   students: [ID!]
   courses: [ID!]
+}
+
+type Subscription {
+  userCreated: DeleteUsersResponseDto!
+  userDeleted: DeleteUsersResponseDto!
 }

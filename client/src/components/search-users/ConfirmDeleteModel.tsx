@@ -1,66 +1,62 @@
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogTitle from "@mui/material/DialogTitle";
+import { Box, Typography, Button } from "@mui/material";
 import { useEffect, useState } from "react";
+import { DELETE_USERS, USER_DELETED_SUBSCRIPTION } from "@/graphql/users";
+import { useApolloClient, useMutation, useSubscription } from "@apollo/client";
 
 interface ConfirmDeleteProps {
-  show: boolean;
   handleClose: () => void;
-  onConfirm: () => void;
+  onDelete: () => void;
+  message: string;
 }
 
 const ConfirmDelete: React.FC<ConfirmDeleteProps> = ({
-  show,
   handleClose,
-  onConfirm,
+  onDelete,
+  message,
 }) => {
-  const [condition, setCondition] = useState("item");
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const currentPage = localStorage.getItem("currentPage");
-      console.log("currentPage:", currentPage);
-
-      switch (currentPage) {
-        case "users":
-          setCondition("users");
-          break;
-        case "courses":
-          setCondition("courses");
-          break;
-        default:
-          setCondition("item");
-      }
-
-      console.log("condition:", condition);
-    }
-  }, [show]);
-
-  console.log("condition:", condition);
-
   const handleClickYes = () => {
-    onConfirm();
+    onDelete();
     handleClose();
   };
 
   return (
-    <Dialog
-      open={show}
-      onClose={handleClose}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
+    <Box
+    // sx={{
+    //   width: 300,
+    //   bgcolor: "background.paper",
+    //   boxShadow: 24,
+    //   p: 3,
+    //   borderRadius: 2,
+    //   display: "flex",
+    //   flexDirection: "column",
+    //   gap: 2,
+    // }}
     >
-      <DialogTitle id="alert-dialog-title">
-        {`Do you want to delete the selected ${condition}?`}
-      </DialogTitle>
-      <DialogActions>
-        <Button onClick={handleClose}>No</Button>
-        <Button onClick={handleClickYes} autoFocus>
+      <Typography variant="h6" gutterBottom component="div">
+        Confirmation
+      </Typography>
+      <Typography sx={{ mt: 1, mb: 2 }}>{message}</Typography>
+      <Box
+        sx={{
+          mt: 2,
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 1,
+        }}
+      >
+        <Button variant="outlined" onClick={handleClose} color="error">
+          No
+        </Button>
+        <Button
+          variant="contained"
+          onClick={handleClickYes}
+          autoFocus
+          color="primary"
+        >
           Yes
         </Button>
-      </DialogActions>
-    </Dialog>
+      </Box>
+    </Box>
   );
 };
 

@@ -36,14 +36,6 @@ const HOCWithModal = <P extends object>(
       "add" | "edit" | "delete" | null
     >(null);
 
-    // const toggleModal = (modalName: string, state: boolean) => {
-    //   setModals((prev) => ({ ...prev, [modalName]: state }));
-    //   setCurrentOperation(
-    //     state ? (modalName as "add" | "edit" | "delete") : null
-    //   );
-    //   console.log("currentOperation:", currentOperation);
-    // };
-
     const toggleModal = (
       modalName: "add" | "edit" | "delete",
       state: boolean
@@ -126,6 +118,7 @@ const HOCWithModal = <P extends object>(
               show={modals[currentOperation]}
               handleClose={getHandleCloseFunction(currentOperation)}
               operation={currentOperation}
+              data={selectedData}
             />
           )
         )}

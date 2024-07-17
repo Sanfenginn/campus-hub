@@ -52,3 +52,36 @@ export type Course = {
     };
   };
 };
+
+export interface UserDeletedResponse {
+  userDeleted: {
+    message: string;
+    errors: string[];
+    results: {
+      id: string;
+      dob: string;
+      account: string;
+      name: {
+        firstName: string;
+        lastName: string;
+      };
+      role: {
+        userType: string;
+        userId: string;
+      };
+      address: {
+        houseNumber: string;
+        street: string;
+        suburb: string;
+        city: string;
+        state: string;
+        country: string;
+        postalCode: string;
+      };
+      contact: {
+        email: string;
+        phone: string;
+      };
+    }[];
+  };
+}

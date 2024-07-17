@@ -1,4 +1,4 @@
-import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
+import { Resolver, Query, Args, Mutation, Subscription } from '@nestjs/graphql';
 import { UserService } from './user.service';
 import { UserResponseDto } from './dtos/user.response.dto';
 import { UserRequestDto } from './dtos/user.request.dto';
@@ -13,6 +13,9 @@ import { TeacherResponseDto } from './dtos/teacher.response.dto';
 import { StudentResponseDto } from './dtos/student.response.dto';
 import { AssignToStudentDto } from './dtos/update-student.dto';
 import { FindUsersRequestDto } from './dtos/find-users.request.dto';
+import { DeleteUsersResponseDto } from './dtos/delete-users-response.dto';
+import { PubSub } from 'graphql-subscriptions';
+const pubSub = new PubSub();
 
 @Resolver()
 export class UserResolver {
@@ -40,8 +43,18 @@ export class UserResolver {
   async createUser(
     @Args('createUserDto') createUserDto: UserRequestDto,
   ): Promise<UserResponseDto> {
-    console.log('createUserDto:', createUserDto);
-    return await this.userService.createUser(createUserDto);
+    const response = await this.userService.createUser(createUserDto);
+    pubSub.publish('userDeleted', { userDeleted: response });
+    return response;
+  }
+
+  @Subscription(() => DeleteUsersResponseDto, {
+    name: 'userCreated',
+  })
+  userCreated() {
+    console.log('开始订阅');
+    console.log(pubSub.asyncIterator('userDeleted'));
+    return pubSub.asyncIterator('userDeleted');
   }
 
   // @UseGuards(JwtAuthGuard, RolesGuard)
@@ -56,9 +69,36 @@ export class UserResolver {
 
   // @UseGuards(JwtAuthGuard, RolesGuard)
   // @Roles(Role.Admin)
-  @Mutation(() => UserResponseDto)
-  async deleteUser(@Args('id') id: string): Promise<UserResponseDto> {
-    return await this.userService.deleteUser(id);
+  @Mutation(() => DeleteUsersResponseDto)
+  async deleteUsers(
+    @Args('id', { type: () => [String] }) id: string[],
+  ): Promise<DeleteUsersResponseDto> {
+    const response = await this.userService.deleteUser(id);
+    console.log('Deleting users, response:', response);
+    const eventPayload = {
+      message: response.message,
+      results: response.results.map((user) => ({
+        id: user.id,
+        dob: user.dob,
+        account: user.account,
+        name: user.name,
+        role: user.role,
+        address: user.address,
+        contact: user.contact,
+      })),
+    };
+    pubSub.publish('userDeleted', { userDeleted: eventPayload });
+    console.log('userDeleted:', eventPayload);
+    return response;
+  }
+
+  @Subscription(() => DeleteUsersResponseDto, {
+    name: 'userDeleted',
+  })
+  userDeleted() {
+    console.log('开始订阅');
+    console.log(pubSub.asyncIterator('userDeleted'));
+    return pubSub.asyncIterator('userDeleted');
   }
 
   // @UseGuards(JwtAuthGuard, RolesGuard)

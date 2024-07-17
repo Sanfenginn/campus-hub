@@ -13,6 +13,7 @@ import { CourseResponseDto } from '../course/dtos/course.response.dto';
 import { AssignToStudentDto } from './dtos/update-student.dto';
 import { ClassResponseDto } from '../class/dtos/class.response.dto';
 import { FindUsersRequestDto } from './dtos/find-users.request.dto';
+import { DeleteUsersResponseDto } from './dtos/delete-users-response.dto';
 
 @Injectable()
 export class UserService {
@@ -170,42 +171,67 @@ export class UserService {
     return updatedUser;
   }
 
-  async deleteUser(id: string): Promise<UserResponseDto> {
-    const existingUser = await this.findOneUser(id);
-    if (!existingUser) {
-      throw new NotFoundException(`User with id ${id} not found`);
-    }
-    const deletedUser = await this.userModel.findByIdAndDelete(id);
-    if (!deletedUser) {
-      throw new NotFoundException(`User with id ${id} delete failed`);
-    }
-    let relatedRecord;
-    if (deletedUser.role.userType === 'student') {
-      relatedRecord = await this.studentModel.findByIdAndDelete(
-        deletedUser.role.userId,
-      );
-      await this.classModel.findByIdAndUpdate(relatedRecord.studentClass, {
-        $pull: { students: relatedRecord._id },
-      });
-    } else if (deletedUser.role.userType === 'teacher') {
-      relatedRecord = await this.teacherModel.findByIdAndDelete(
-        deletedUser.role.userId,
-      );
-      relatedRecord.courses.map(async (course) => {
-        await this.courseModel.findByIdAndUpdate(course, {
-          instructor: null,
-        });
-      });
-      relatedRecord.studentClasses.map(async (studentClass) => {
-        await this.classModel.findByIdAndUpdate(studentClass, {
-          $pull: { teachers: relatedRecord._id },
-        });
-      });
-    }
-    if (!relatedRecord) {
-      throw new NotFoundException('Delete related record failed');
-    }
-    return deletedUser;
+  async deleteUser(ids: string[]): Promise<DeleteUsersResponseDto> {
+    await Promise.all(
+      ids.map(async (id) => {
+        if (!Types.ObjectId.isValid(id)) {
+          throw new NotFoundException(`Invalid ID ${id} format`);
+        }
+        const existingUser = await this.findOneUser(id);
+        if (!existingUser) {
+          throw new NotFoundException(`User with id ${id} not found`);
+        }
+      }),
+    );
+    const results = await Promise.all(
+      ids.map(async (id) => {
+        const deletedUser = await this.userModel.findByIdAndDelete(id);
+        if (!deletedUser) {
+          throw new NotFoundException(`User with id ${id} delete failed`);
+        }
+
+        let relatedRecord;
+        if (deletedUser.role.userType === 'student') {
+          relatedRecord = await this.studentModel.findByIdAndDelete(
+            deletedUser.role.userId,
+          );
+          if (relatedRecord) {
+            await this.classModel.findByIdAndUpdate(
+              relatedRecord.studentClass,
+              {
+                $pull: { students: relatedRecord._id },
+              },
+            );
+          }
+        } else if (deletedUser.role.userType === 'teacher') {
+          relatedRecord = await this.teacherModel.findByIdAndDelete(
+            deletedUser.role.userId,
+          );
+          if (relatedRecord) {
+            await Promise.all(
+              relatedRecord.courses.map((course) =>
+                this.courseModel.findByIdAndUpdate(course, {
+                  instructor: null,
+                }),
+              ),
+            );
+            await Promise.all(
+              relatedRecord.studentClasses.map((studentClass) =>
+                this.classModel.findByIdAndUpdate(studentClass, {
+                  $pull: { teachers: relatedRecord._id },
+                }),
+              ),
+            );
+          }
+        }
+        if (!relatedRecord) {
+          throw new NotFoundException('Delete related record failed');
+        }
+        return deletedUser;
+      }),
+    );
+
+    return { message: 'Users deleted successfully', results };
   }
 
   async assignToTeacher(

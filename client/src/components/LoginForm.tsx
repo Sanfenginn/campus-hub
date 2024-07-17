@@ -13,7 +13,6 @@ type UserType = "admin" | "student" | "teacher";
 const LoginForm: React.FC = () => {
   const [login, { error }] = useMutation(LOGIN);
   const router = useRouter();
-  const [isClient, setIsClient] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
