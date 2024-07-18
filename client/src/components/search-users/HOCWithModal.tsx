@@ -1,11 +1,10 @@
 "use client";
-import React, { useState, ComponentType } from "react";
+import { useState, ComponentType, useEffect } from "react";
 import SearchModel from "@/components/common/SearchModal";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/store";
 import { setReminder } from "@/redux/reminder";
 import ReminderForSelection from "@/components/common/Reminder";
-import { useEffect } from "react";
 
 export interface HOCWithModalProps {
   onAdd: () => void;
@@ -55,7 +54,7 @@ const HOCWithModal = <P extends object>(
       }
     }, [modals]);
 
-    console.log("currentOperation:", currentOperation);
+    // console.log("currentOperation:", currentOperation);
 
     const handleAddModelShow = () => toggleModal("add", true);
     const handleAddModelClose = () => toggleModal("add", false);

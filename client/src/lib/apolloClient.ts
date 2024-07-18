@@ -27,8 +27,8 @@ function createApolloClient() {
             // retryAttempts: 5,
 
             on: {
-              connected: () => console.log("connected"),
-              closed: () => console.log("closed"),
+              connected: () => console.log("websocket connected"),
+              closed: () => console.log("websocket closed"),
               error: (err) => console.error("error", err),
             },
           })

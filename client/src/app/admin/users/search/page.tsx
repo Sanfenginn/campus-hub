@@ -3,7 +3,11 @@ import SearchUsers from "@/components/search-users/SearchUser";
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setUsersData } from "@/redux/usersData";
-import { FIND_USERS, USER_DELETED_SUBSCRIPTION } from "@/graphql/users";
+import {
+  FIND_USERS,
+  USER_DELETED_SUBSCRIPTION,
+  USER_ADDED_SUBSCRIPTION,
+} from "@/graphql/users";
 import { useSubscription, useApolloClient } from "@apollo/client";
 import { RootState } from "@/redux/store";
 
@@ -11,6 +15,17 @@ const UsersSearchPage: React.FC = () => {
   const dispatch = useDispatch();
   const client = useApolloClient();
   const usersData = useSelector((state: RootState) => state.usersData);
+
+  useSubscription(USER_ADDED_SUBSCRIPTION, {
+    onData: ({ data }) => {
+      const createdUsers = data?.data?.userCreated;
+      console.log("createdUsers: ", createdUsers);
+      //将新创建的用户添加到用户数据中
+      const restUserData = [...usersData, createdUsers];
+      console.log("restUserData: ", restUserData);
+      dispatch(setUsersData(restUserData));
+    },
+  });
 
   useSubscription(USER_DELETED_SUBSCRIPTION, {
     onData: ({ data }) => {

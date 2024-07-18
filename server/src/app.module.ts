@@ -23,7 +23,7 @@ import { AuthModule } from './auth/auth.module';
           path: '/graphql',
           // keepAlive: 1000,
           onConnect: (connectionParams) => {
-            console.log('Client connected for subscriptions.');
+            console.log('websocket connected');
             try {
               console.log('connectionParams', connectionParams);
             } catch (error) {
@@ -32,7 +32,7 @@ import { AuthModule } from './auth/auth.module';
             }
           },
           onDisconnect: (webSocket, context) => {
-            console.log('Client disconnected from subscriptions.');
+            console.log('websocket disconnected');
             if (context) {
               console.log('Disconnection context:', context);
             }

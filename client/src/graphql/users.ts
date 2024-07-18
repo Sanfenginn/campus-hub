@@ -73,3 +73,34 @@ export const USER_DELETED_SUBSCRIPTION = gql`
     }
   }
 `;
+
+export const USER_ADDED_SUBSCRIPTION = gql`
+  subscription OnUserCreated {
+    userCreated {
+      id
+      dob
+      account
+      name {
+        firstName
+        lastName
+      }
+      role {
+        userType
+        userId
+      }
+      address {
+        houseNumber
+        street
+        suburb
+        city
+        state
+        country
+        postalCode
+      }
+      contact {
+        email
+        phone
+      }
+    }
+  }
+`;

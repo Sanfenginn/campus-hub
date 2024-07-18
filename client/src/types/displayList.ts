@@ -24,8 +24,34 @@ export type User = {
   };
 };
 
+export const emptyUser: User = {
+  id: "",
+  name: {
+    firstName: "",
+    lastName: "",
+  },
+  dob: new Date(),
+  contact: {
+    email: "",
+    phone: "",
+  },
+  address: {
+    houseNumber: "",
+    street: "",
+    suburb: "",
+    city: "",
+    state: "",
+    country: "",
+    postalCode: "",
+  },
+  account: "",
+  role: {
+    userType: "",
+  },
+};
+
 export type Course = {
-  _id: string;
+  id: string;
   name: string;
   description: string;
   instructor: {

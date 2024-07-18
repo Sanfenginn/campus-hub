@@ -5,7 +5,8 @@ import getPathName from "@/utils/getPathName";
 import ConfirmDelete from "@/components/search-users/ConfirmDeleteModel";
 import { DELETE_USERS } from "@/graphql/users";
 import { useMutation } from "@apollo/client";
-import { User } from "@/types/displayList";
+import { User, emptyUser } from "@/types/displayList";
+import BaseForm from "@/components/common/Form/BaseForm";
 
 interface AddUserProps {
   show: boolean;
@@ -27,7 +28,7 @@ const style = {
   borderRadius: "10px",
 };
 
-const UserModel: React.FC<AddUserProps> = ({
+const SearchModel: React.FC<AddUserProps> = ({
   show,
   handleClose,
   operation,
@@ -35,41 +36,68 @@ const UserModel: React.FC<AddUserProps> = ({
 }) => {
   const pathName = getPathName();
   const [deleteUsers] = useMutation(DELETE_USERS);
+  const [userData, setUserData] = React.useState<User>(emptyUser);
 
   // console.log("operation: ", operation);
   // console.log("pathName: ", pathName);
 
+  if (
+    (pathName === "/admin/users" || pathName === "/admin/users/search") &&
+    operation === "edit"
+  ) {
+    userData.id = data?.[0].id ?? "";
+    userData.name.firstName = data?.[0].name.firstName ?? "";
+    userData.name.lastName = data?.[0].name.lastName ?? "";
+    userData.dob = data?.[0].dob ?? new Date();
+    userData.contact.email = data?.[0].contact.email ?? "";
+    userData.contact.phone = data?.[0].contact.phone ?? "";
+    userData.address.houseNumber = data?.[0].address.houseNumber ?? "";
+    userData.address.street = data?.[0].address.street ?? "";
+    userData.address.suburb = data?.[0].address.suburb ?? "";
+    userData.address.city = data?.[0].address.city ?? "";
+    userData.address.state = data?.[0].address.state ?? "";
+    userData.address.country = data?.[0].address.country ?? "";
+    userData.address.postalCode = data?.[0].address.postalCode ?? "";
+    userData.account = data?.[0].account ?? "";
+    userData.role.userType = data?.[0].role.userType ?? "";
+  }
+
   let message = "";
-  if (pathName === "/admin/users") {
+  if (pathName === "/admin/users" || pathName === "/admin/users/search") {
     message = "Do you want to delete the user you selected?";
   }
 
-  console.log("data", data);
-  // console.log("userDeletedData", userDeletedData);
-
-  const id: string[] | undefined = data?.map((item) => item.id);
-  console.log("id", id);
+  const ids: string[] | undefined = data?.map((item) => item.id);
 
   const handleDelete = async () => {
     try {
       if (pathName === "/admin/users" || pathName === "/admin/users/search") {
-        const { data } = await deleteUsers({
-          variables: { id: id },
+        await deleteUsers({
+          variables: { id: ids },
         });
-        console.log("data", data);
       }
     } catch (err) {
       console.error(err);
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log("submit");
+  };
+
   let UserComponent: JSX.Element | null = null;
   switch (operation) {
     case "add":
-      UserComponent = <div>add</div>;
-      break;
     case "edit":
-      UserComponent = <div>edit</div>;
+      UserComponent = (
+        <BaseForm
+          onAdd={setUserData}
+          operation={operation}
+          handleClose={handleClose}
+          data={userData}
+        />
+      );
       break;
     case "delete":
       UserComponent = (
@@ -102,4 +130,4 @@ const UserModel: React.FC<AddUserProps> = ({
   );
 };
 
-export default UserModel;
+export default SearchModel;

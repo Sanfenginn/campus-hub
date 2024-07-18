@@ -44,17 +44,15 @@ export class UserResolver {
     @Args('createUserDto') createUserDto: UserRequestDto,
   ): Promise<UserResponseDto> {
     const response = await this.userService.createUser(createUserDto);
-    pubSub.publish('userDeleted', { userDeleted: response });
+    pubSub.publish('userCreated', { userCreated: response });
     return response;
   }
 
-  @Subscription(() => DeleteUsersResponseDto, {
+  @Subscription(() => UserResponseDto, {
     name: 'userCreated',
   })
   userCreated() {
-    console.log('开始订阅');
-    console.log(pubSub.asyncIterator('userDeleted'));
-    return pubSub.asyncIterator('userDeleted');
+    return pubSub.asyncIterator('userCreated');
   }
 
   // @UseGuards(JwtAuthGuard, RolesGuard)
@@ -74,7 +72,6 @@ export class UserResolver {
     @Args('id', { type: () => [String] }) id: string[],
   ): Promise<DeleteUsersResponseDto> {
     const response = await this.userService.deleteUser(id);
-    console.log('Deleting users, response:', response);
     const eventPayload = {
       message: response.message,
       results: response.results.map((user) => ({
@@ -88,7 +85,6 @@ export class UserResolver {
       })),
     };
     pubSub.publish('userDeleted', { userDeleted: eventPayload });
-    console.log('userDeleted:', eventPayload);
     return response;
   }
 
@@ -96,8 +92,6 @@ export class UserResolver {
     name: 'userDeleted',
   })
   userDeleted() {
-    console.log('开始订阅');
-    console.log(pubSub.asyncIterator('userDeleted'));
     return pubSub.asyncIterator('userDeleted');
   }
 
