@@ -22,10 +22,9 @@ import { AuthModule } from './auth/auth.module';
         'graphql-ws': {
           path: '/graphql',
           // keepAlive: 1000,
-          onConnect: (connectionParams) => {
-            console.log('websocket connected');
+          onConnect: () => {
             try {
-              console.log('connectionParams', connectionParams);
+              console.log('websocket connected');
             } catch (error) {
               console.error('Connection error:', error);
               throw error; // 这将断开连接
