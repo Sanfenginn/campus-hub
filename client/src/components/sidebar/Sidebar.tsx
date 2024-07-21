@@ -35,7 +35,7 @@ const Sidebar: React.FC = () => {
   // console.log("options", options);
 
   const handleOptionClick = (pathname: string) => {
-    console.log("pathname", pathname);
+    // console.log("pathname", pathname);
     router.push(pathname);
   };
 

@@ -11,7 +11,7 @@ import { AuthModule } from './auth/auth.module';
   imports: [
     AuthModule,
     ConfigModule.forRoot({
-      envFilePath: '.env',
+      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
       isGlobal: true, // 设置为全局模块
     }),
     DatabaseModule,
@@ -20,7 +20,7 @@ import { AuthModule } from './auth/auth.module';
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       subscriptions: {
         'graphql-ws': {
-          path: '/graphql',
+          path: '/subscriptions',
           // keepAlive: 1000,
           onConnect: () => {
             try {

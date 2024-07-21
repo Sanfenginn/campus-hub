@@ -68,7 +68,6 @@ const getStudentById = async (req, res, next) => {
 const addStudent = async (req, res, next) => {
   // const { name, age, studentClass, contact, address } = req.body;
   const students = req.body; // 前端传来的学生数组
-  //TODO: 需要验证数据
 
   try {
     //   const student = new StudentModel({

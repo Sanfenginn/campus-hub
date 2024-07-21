@@ -1,5 +1,5 @@
 "use client";
-import { useState, ComponentType, useEffect } from "react";
+import React, { useState, ComponentType, useEffect } from "react";
 import SearchModel from "@/components/common/SearchModal";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/store";
@@ -32,11 +32,11 @@ const HOCWithModal = <P extends object>(
     });
 
     const [currentOperation, setCurrentOperation] = useState<
-      "add" | "edit" | "delete" | null
+      "add" | "edit" | "delete" | "reminderForSelection" | null
     >(null);
 
     const toggleModal = (
-      modalName: "add" | "edit" | "delete",
+      modalName: "add" | "edit" | "delete" | "reminderForSelection",
       state: boolean
     ) => {
       setModals((prev) => ({ ...prev, [modalName]: state }));
@@ -85,7 +85,7 @@ const HOCWithModal = <P extends object>(
     const handleReminderForSelectionClose = () =>
       toggleModal("reminderForSelection", false);
 
-    const getHandleCloseFunction = (operation: "add" | "edit" | "delete") => {
+    const getHandleCloseFunction = (operation: "add" | "edit" | "delete" | "reminderForSelection") => {
       switch (operation) {
         case "add":
           return handleAddModelClose;

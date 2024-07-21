@@ -1,0 +1,19 @@
+version: '3'
+services:
+  server:
+    image: jinyuanzhang1992/campus-hub-server:latest
+    platform: linux/amd64
+    ports:
+      - "51003:51003"
+    environment:
+      - NODE_ENV=production
+
+  client:
+    image: jinyuanzhang1992/campus-hub-client:latest
+    platform: linux/amd64
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - server

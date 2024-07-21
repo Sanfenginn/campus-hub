@@ -37,7 +37,7 @@ const UsersList: React.FC = () => {
     // }
 
     dispatch(setSelectedDataInfo(selectedData));
-    console.log("selectedData:", selectedData);
+    // console.log("selectedData:", selectedData);
   };
   //newSelectionModel指的是选中的行的id
   //selectedUsers是选中的行的数据

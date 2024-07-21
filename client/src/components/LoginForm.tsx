@@ -20,6 +20,14 @@ const LoginForm: React.FC = () => {
     const account = formData.get("account") as string;
     const password = formData.get("password") as string;
 
+    if (process.env.NODE_ENV !== 'production') {
+      console.log("account: ", account);
+      console.log("password: ", password);
+      console.log("当前Graphql访问路径: ", process.env.NEXT_PUBLIC_API_URL);
+      console.log("当前websocket访问路径: ", process.env.NEXT_PUBLIC_WEBSOCKET_URL);
+      console.log("当前环境: ", process.env.NODE_ENV);
+    }
+
     try {
       const input = {
         account,

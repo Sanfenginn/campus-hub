@@ -38,7 +38,7 @@ export const getRows = (pathName: string, data: any): any[] => {
       const instructorName = `${instructorFirstName} ${instructorLastName}`;
 
       return {
-        id: course._id,
+        id: course.id,
         name: course.name,
         description: course.description,
         instructor: instructorName,

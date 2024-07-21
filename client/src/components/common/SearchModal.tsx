@@ -6,12 +6,12 @@ import ConfirmDelete from "@/components/search-users/ConfirmDeleteModel";
 import { DELETE_USERS } from "@/graphql/users";
 import { useMutation } from "@apollo/client";
 import { User, emptyUser } from "@/types/displayList";
-import BaseForm from "@/components/common/Form/BaseForm";
+// import BaseForm from "@/components/common/Form/BaseForm";
 
 interface AddUserProps {
   show: boolean;
   handleClose: () => void;
-  operation: "add" | "edit" | "delete";
+  operation: "add" | "edit" | "delete" | "reminderForSelection";
   data?: User[];
 }
 
@@ -83,22 +83,22 @@ const SearchModel: React.FC<AddUserProps> = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("submit");
+    // console.log("submit");
   };
 
   let UserComponent: JSX.Element | null = null;
   switch (operation) {
-    case "add":
-    case "edit":
-      UserComponent = (
-        <BaseForm
-          onAdd={setUserData}
-          operation={operation}
-          handleClose={handleClose}
-          data={userData}
-        />
-      );
-      break;
+    // case "add":
+    // case "edit":
+    //   UserComponent = (
+    //     <BaseForm
+    //       onAdd={setUserData}
+    //       operation={operation}
+    //       handleClose={handleClose}
+    //       data={userData}
+    //     />
+    //   );
+    //   break;
     case "delete":
       UserComponent = (
         <ConfirmDelete
